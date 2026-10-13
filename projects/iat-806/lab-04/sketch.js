@@ -1,91 +1,112 @@
-let frames = []; //arrays for putting images of the fairies
-let frames2 = []; //
-let numFrames = 7; //number of animations that will be called
+// IAT 806 · Lab 04 starter: the dancer grid from Week 4, ready for your website.
+// Run with Live Server. Uses p5 2.x (async setup, await loadImage).
 
-let numCols = 8; // number of columns
-let numRows = 6; // number of rows
-let colWidth; // width of each box
-let rowHeight; // heigth of each box
-let colors = []; //arrays to assign random colors in each boxes
-let speeds = []; // arrays to assign different animation speed
+let frames = []; // the 8 dance poses
+let frames2 = []; // TODO: load the jump poses into this array
+let numFrames = 8;
+
+let numCols = 20;
+let numRows = 10;
+let colWidth;
+let rowHeight;
+
+// 2D arrays: one color and one speed for every cell in the grid
+let colors = [];
+let speeds = [];
 
 async function setup() {
-  //async: wait until images are uploaded!
-  createCanvas(800, 420);
+  const canvas = createCanvas(800, 420);
+
+  // puts the canvas inside <div id="sketch-holder"> in index.html
+  canvas.parent("sketch-holder");
 
   for (let i = 0; i < numCols; i++) {
-    //starting a loop as much as the number of columns
-    colors[i] = []; //assigning empty array for color
-    speeds[i] = []; //assigning empty array for speed
+    colors[i] = [];
+    speeds[i] = [];
     for (let j = 0; j < numRows; j++) {
-      //starting loop as much as the number of rows
-      colors[i][j] = random(1, 255); //assigning random colors between 1-255
-      speeds[i][j] = random(1, 10); //assigning random speed
+      colors[i][j] = [random(1, 255), random(1, 255), random(1, 255)];
+      speeds[i][j] = random(1, 10);
     }
+  }
+  colWidth = width / numCols;
+  rowHeight = height / numRows;
 
-    colWidth = width / numCols; //calculating the width of the small boxes
-    rowHeight = height / numRows; //calculating the height of the small boxes
+  for (let i = 0; i < numFrames; i++) {
+    let fileName = "dance_frames/fairy_" + i + ".png";
+    frames.push(await loadImage(fileName));
+  }
 
-    for (let i = 0; i < numFrames; i++) {
-      // loop as much as the number of frames
-      let fileName = `dance_frames/fairy_${i}.png`; //defining filename
-      frames.push(await loadImage(fileName)); // it "awaits" until the image comes, and "pushes" the frames at the end of arrays
-      // frames.push(await loadImage(`dance_frames/fairy_${i}.png`)); => I can do this too instead of above two lines
-    }
+  for (let i = 0; i < 4; i++) {
+    let fileName = "jump_frames/jump" + i + ".png";
+    frames2.push(await loadImage(fileName));
   }
 }
 
 function draw() {
-  //drawing start!
-  background(120); //**why? covers the remainder of previous's frame
-  fill("black"); //defining the color of text/shapes that will be drawn
-
-  numCols = map(mouseX, 0, width, 1, 20); //why> why 20? what does each space mean?
-  text("number of columns" + " " + numCols, 500, 100);
+  background(120);
+  //   if (mouseX < width) {
+  //     numCols = Math.floor(map(mouseX, 0, width, 2, 20));
+  //     // dist the mouse position and the position of the dancing profs
+  //     // in the grid, and then use that number to map to the speed.
+  //     colWidth = width / numCols;
+  //   }
 
   for (let i = 0; i < numCols; i++) {
-    //for loop to draw boxes and change colors
-    fill(0, 100, 100);
-    // fill(0, random(1,250), random(0,250));
     for (let j = 0; j < numRows; j++) {
-      //for loop as much as the number of Rows
+      fill(colors[i][j][0], colors[i][j][1], colors[i][j][2], 120);
       rect(i * colWidth, j * rowHeight, colWidth, rowHeight);
-      // fill(0, random(1,250), random(0,250)); //randomising each box!
+
+      // Find the center of each dancer's grid cell
+      let x = i * colWidth + colWidth / 2;
+      let y = j * rowHeight + rowHeight / 2;
+
+      // Calculate distance from this dancer to the mouse
+      let d = dist(x, y, mouseX, mouseY);
+
+      // Find the maximum possible distance across the screen
+      let maxDist = dist(0, 0, width, height);
+
+      // Speed adjustment based on distance from mouse
+      let distFactor = map(d, 0, maxDist, 0.2, 10);
+      let speed = speeds[i][j] * distFactor;
+
+      let danceFrames;
+      if ((i + j) % 2 === 0) {
+        danceFrames = frames; // 8개의 춤 포즈
+      } else {
+        danceFrames = frames2; // 4개의 점프 포즈
+      }
+
+      animate(danceFrames, speed, i * colWidth, j * rowHeight, colWidth);
     }
   }
-
-  let speeds = 10;
-  let imageWidth = 500;
-  let imageHeight = 400;
-
-  animate(frames, 10, 100, 100, 100); //animate(frames, speed, xPosition, yPosition, width, height)
-  animate(frames, 20, 200, 100, 200); //these are the inputs for below animate function
-  animate(frames, 30, 300, 100, 300);
-  animate(frames, 40, 500, 100, 400);
 }
 
-function animate(frames, speed, xPosition, yPosition, imageWidth, imageHeight) {
-  //lists of inputs
-  let index = getFrameIndex(speed); //why > why is this here? index = frame number
-  let currentFrame = frames[index]; //takes image out of the array
-  let origWidth = currentFrame.width; //calls original width of the frame
-  let origHeight = currentFrame.height; //calls original height of the frame
+// draws one dancer: which poses, how fast, where, and how big
+function animate(
+  danceFrames,
+  speed,
+  xPosition,
+  yPosition,
+  imageWidth,
+  imageHeight,
+) {
+  // ⬇️ getFrameIndex에 현재 프레임 배열을 함께 전달합니다
+  let index = getFrameIndex(danceFrames, speed);
+  let currentFrame = danceFrames[index];
+  let origWidth = currentFrame.width;
+  let origHeight = currentFrame.height;
   if (imageWidth && !imageHeight) {
-    //if image width is defined AND NOT image height,
-    let scale = imageWidth / origWidth; //defining the scale: imageWidth (how it's defined) divided by original width (original)>> finding the scale
-    //e.g., image width 200, original width 100 => the scale is 2
-    //e.g., image width 100, origianl width 200 => the scale is 0.5
-    imageHeight = scale * origHeight; //defining undefined imageHeight to match the scale
+    let scale = imageWidth / origWidth;
+    imageHeight = scale * origHeight;
   }
-
   image(currentFrame, xPosition, yPosition, imageWidth, imageHeight);
-  //gets all the input and finally draws it in the right size, right position
 }
 
-function getFrameIndex(speed) {
-  //to find what frames to call based on the speed
-  let slowFrame = Math.floor(frameCount / speed); //adjusting the speed
-  let index = slowFrame % frames.length; // to give back the index of the loop as much as frame length
+// ⬇️ getFrameIndex가 전달받은 배열의 길이를 사용하도록 수정합니다
+function getFrameIndex(currentFrames, speed) {
+  let slowFrame = Math.floor(frameCount / speed);
+  let index = slowFrame % currentFrames.length;
 
-  return index; //giving index to be used in animate function
+  return index;
 }
