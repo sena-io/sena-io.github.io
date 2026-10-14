@@ -2,7 +2,7 @@
 // Run with Live Server. Uses p5 2.x (async setup, await loadImage).
 
 let frames = []; // the 8 dance poses
-let frames2 = []; // TODO: load the jump poses into this array
+let frames2 = []; // jump poses into this array
 let numFrames = 8;
 
 let numCols = 20;
@@ -91,7 +91,7 @@ function animate(
   imageWidth,
   imageHeight,
 ) {
-  // ⬇️ getFrameIndex에 현재 프레임 배열을 함께 전달합니다
+  // ⬇️ getFrameIndex to current frame
   let index = getFrameIndex(danceFrames, speed);
   let currentFrame = danceFrames[index];
   let origWidth = currentFrame.width;
