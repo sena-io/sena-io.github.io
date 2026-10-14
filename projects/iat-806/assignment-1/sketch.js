@@ -7,7 +7,7 @@ let petalImg;
 async function setup() {
   createCanvas(800, 600);
 
-  // Your working image loader
+  // Image Loader
   for (let i = 0; i < 8; i++) {
     let fileName = `images/flower${i}.png`;
     let img = await loadImage(fileName);
@@ -33,13 +33,15 @@ function draw() {
   // If the switch is ON, roll a 100-sided die.
   // If the result is less than 5, spawn a flower!
   if (autoSpawn === true) {
+    //auto creates flower
     if (random(100) < 5) {
+      //make flower with 5% of possibility of each frame
       let newFlower = {
         x: random(width), // Appears anywhere on the canvas width
         y: random(height), // Appears anywhere on the canvas height
         size: random(20, 100),
         img: random(flowerImages),
-        spawnTime: millis(),
+        spawnTime: millis(), // recording spawn time
       };
 
       flowers.push(newFlower);
@@ -47,6 +49,7 @@ function draw() {
   }
 
   // Loop backwards through the array
+  // Deleting flowers after 1.5 second
   for (let i = flowers.length - 1; i >= 0; i--) {
     let f = flowers[i];
 
@@ -91,6 +94,7 @@ function mousePressed() {
   flowers.push(newFlower);
 }
 
+//ripple effect using circle
 function drawFlower(f) {
   noStroke(); // Removes the black outline from the shapes
 
@@ -111,14 +115,9 @@ function drawFlower(f) {
   image(f.img, f.x, f.y, f.size, f.size);
 }
 
-function keyPressed() {
-  if (key === "r") {
-    autoSpawn = true;
-  } else if (key === "s") {
-    autoSpawn = false;
-  }
-}
-
+// if KeyPressed R, randomly appear
+// if KeyPressed S, stop randomly appearing
+// if Spacebar pressed, flower petals rain
 function keyPressed() {
   if (key === "r") {
     autoSpawn = true;
