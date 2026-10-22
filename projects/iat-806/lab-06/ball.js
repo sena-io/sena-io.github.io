@@ -1,12 +1,12 @@
 class Ball {
-  constructor(x, y, c, r, maxR = 10) {
+  constructor(x, y, c, r, maxR = 20) {
     // it's like the instance saying, MY X is 400. In Python the keyword is self.x.
     this.x = x;
     this.y = y;
     this.originalColor = c;
     //this.color is the one that changes.
     this.color = c;
-    this.highlightColor = "red";
+    this.highlightColor = color(255, 10, 10);
     // ALSO this is a diameter, not radius.
     // This is our mistake... we should have looked at the documentation.
     this.r = r;
@@ -31,10 +31,12 @@ class Ball {
 
   //method
   highlight() {
+    // this.clicked = true;
     this.color = this.highlightColor;
   }
 
   deHighlight() {
+    // this.clicked = false;
     this.color = this.originalColor;
   }
 

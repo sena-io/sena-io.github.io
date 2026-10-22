@@ -31,10 +31,5 @@ function mousePressed() {
     // equals, greater than: Arrow function
     let active = ball.contains(mouseX, mouseY); //defines active
     ball.respond(active);
-    // if (ball.contains(mouseX, mouseY)) {
-    //   ball.highlight();
-    // } else {
-    //   ball.deHighlight();
-    // }
   });
 }
