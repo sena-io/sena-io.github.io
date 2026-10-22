@@ -1,16 +1,17 @@
 class Ball {
-  constructor(x, y, c, r, maxR = 20) {
+  constructor(x, y, c, r, maxR = 10) {
     // it's like the instance saying, MY X is 400. In Python the keyword is self.x.
     this.x = x;
     this.y = y;
     this.originalColor = c;
     //this.color is the one that changes.
     this.color = c;
-    this.highlightColor = color(255, 10, 10);
+    this.highlightColor = color(210, 200, 10);
     // ALSO this is a diameter, not radius.
     // This is our mistake... we should have looked at the documentation.
     this.r = r;
     this.maxR = maxR;
+    this.clicked = "false";
     // TODO: if one of your methods needs a new attribute, create it here.
   }
 
@@ -40,6 +41,12 @@ class Ball {
     this.color = this.originalColor;
   }
 
+  //is the ball on the body?
+  isOnBody(mask) {
+    let pixel = mask.get(floor(this.x), floor(this.y)); // [r,g,b,a] alpha = opacity
+    return pixel[3] < 128;
+  }
+
   //this is going to tell if point X and point Y is inside the colum
   contains(pointX, pointY) {
     let distance = dist(this.x, this.y, pointX, pointY);
@@ -67,7 +74,7 @@ class Ball {
 function createRandomBall() {
   let ballX = random(0, width);
   let ballY = random(0, height);
-  let ballC = color(20, 130, 140 + random(-100, 100), 120);
+  let ballC = color(20, 130, 140 + random(-100, 100), 100); // last digit is opacity
   let ballR = 10;
   let ball = new Ball(ballX, ballY, ballC, ballR);
   return ball;
