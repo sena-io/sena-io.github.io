@@ -3,7 +3,6 @@ let numberOfBalls = 1000;
 let flowerImg = null;
 let imgLoaded = false;
 
-
 function setup() {
   createCanvas(600, 600);
 
@@ -33,7 +32,7 @@ function draw() {
 function drawFlowerCursor(x, y) {
   push();
   imageMode(CENTER);
-  
+
   if (imgLoaded && flowerImg) {
     let flowerSize = 36;
     image(flowerImg, x, y, flowerSize, flowerSize);
@@ -61,7 +60,7 @@ class Ball {
     this.color = c;
     this.pulseOffset = random(TWO_PI);
   }
-  // changing the ball size, position, pulse constantly 
+  // changing the ball size, position, pulse constantly
   change(byHowMuch) {
     this.changeSize(byHowMuch);
     this.move(byHowMuch);
