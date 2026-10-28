@@ -1,8 +1,10 @@
 // this is how we define a class
-// attributes
-// methods
+// attributes: data it holds
+// methods: actions it can perform
 // this is a blueprint for creating stuff.
 // We can create new balls using this.
+
+// 1. Create a Ball class
 class Ball {
   // this function is called when an instance of Ball is created.
   // x ix x position
@@ -10,6 +12,10 @@ class Ball {
   // c is color
   // r is radius
   // this is the function that is called when you create a new ball or a new instance of this Class.
+
+  // 1-1. Create a constructor
+  // * constructor is a special methods inside a class to intialize a newly created object
+  // * this = the specific instance of the class (x is a temporary value so we need this to define it)
   constructor(x, y, fillColor, r) {
     this.x = x;
     this.y = y;
@@ -20,7 +26,7 @@ class Ball {
     this.origColor = fillColor;
     this.fillColor = fillColor;
     this.defaultStrokeColor = "black";
-    this.highlightColor = color(100, 100, 100, 50);
+    this.highlightColor = color(0, 200, 250, 50);
     this.showStroke = false;
   }
 
@@ -71,6 +77,7 @@ class Ball {
   }
 }
 
+// 2. Create a FlickerBall class
 class FlickerBall extends Ball {
   respond(active) {
     super.respond(active);
