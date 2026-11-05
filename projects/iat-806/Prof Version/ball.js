@@ -16,11 +16,12 @@ class Ball {
   // 1-1. Create a constructor
   // * constructor is a special methods inside a class to intialize a newly created object
   // * this = the specific instance of the class (x is a temporary value so we need this to define it)
+  // 1-1-a. attributes = x position, y position, fillColor, r(radius)
   constructor(x, y, fillColor, r) {
     this.x = x;
     this.y = y;
 
-    this.startFrame = frameCount;
+    //
     this.baseR = r;
     this.r = r;
     this.origColor = fillColor;
