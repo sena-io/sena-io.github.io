@@ -1,81 +1,88 @@
+// this is how we define a class
+// attributes: data it holds
+// methods: actions it can perform
+// this is a blueprint for creating stuff.
+// We can create new balls using this.
+
+// 1. Create a Ball class
 class Ball {
-  constructor(x, y, c, r, maxR = 10) {
-    // it's like the instance saying, MY X is 400. In Python the keyword is self.x.
+  // this function is called when an instance of Ball is created.
+  // x ix x position
+  // y is y position
+  // c is color
+  // r is radius
+  // this is the function that is called when you create a new ball or a new instance of this Class.
+
+  // 1-1. Create a constructor
+  // * constructor is a special methods inside a class to intialize a newly created object
+  // * this = the specific instance of the class (x is a temporary value so we need this to define it)
+  // 1-1-a. attributes = x position, y position, fillColor, r(radius)
+  constructor(x, y, fillColor, r) {
     this.x = x;
     this.y = y;
-    this.originalColor = c;
-    //this.color is the one that changes.
-    this.color = c;
-    this.highlightColor = color(210, 200, 10);
-    // ALSO this is a diameter, not radius.
-    // This is our mistake... we should have looked at the documentation.
+
+    //
+    this.baseR = r;
     this.r = r;
-    this.maxR = maxR;
-    this.clicked = "false";
-    // TODO: if one of your methods needs a new attribute, create it here.
+    this.origColor = fillColor;
+    this.fillColor = fillColor;
+    this.defaultStrokeColor = "black";
+    this.highlightColor = color(0, 200, 250, 50);
+    this.showStroke = false;
   }
 
   update(byHowMuch) {
-    this.changeSize(byHowMuch);
     this.move(byHowMuch);
     this.show();
   }
 
-  respond(active) {
-    //gets the condition from sketch.js if mouse X, mouseY is inside the ball.
-    if (active) {
-      this.highlight(); //if the condition is "ture" > change the condition to "this.highlight" which is defined in the class
-    } else {
-      this.deHighlight();
-    }
-  }
-
-  //method
-  highlight() {
-    // this.clicked = true;
-    this.color = this.highlightColor;
-  }
-
-  deHighlight() {
-    // this.clicked = false;
-    this.color = this.originalColor;
-  }
-
-  //is the ball on the body?
-  isOnBody(mask) {
-    let pixel = mask.get(floor(this.x), floor(this.y)); // [r,g,b,a] alpha = opacity
-    return pixel[3] < 128;
-  }
-
-  //this is going to tell if point X and point Y is inside the colum
-  contains(pointX, pointY) {
-    let distance = dist(this.x, this.y, pointX, pointY);
-    return distance < this.r;
-  }
-
   move(byHowMuch) {
-    // this.x = this.x + random(-5,5)
     this.x += random(-byHowMuch, byHowMuch);
     this.y += random(-byHowMuch, byHowMuch);
   }
 
   changeSize(byHowMuch) {
-    // we fix the size like this:
-    // the constrain is saying that it shouldn't grow larger than a certain amount.
-    this.r = constrain(this.r + random(-byHowMuch, byHowMuch), 2, this.maxR);
+    this.r = constrain(this.r + random(-byHowMuch, byHowMuch), 2, 30);
+  }
+
+  contains(px, py) {
+    if (dist(this.x, this.y, px, py) < this.r) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  respond(active) {
+    if (active) this.highlight();
+    else this.deHighlight();
+  }
+
+  highlight() {
+    this.fillColor = this.highlightColor;
+  }
+
+  deHighlight() {
+    this.fillColor = this.origColor;
+  }
+
+  isOnBody(mask) {
+    let px = mask.get(floor(this.x), floor(this.y)); // [r, g, b, a]
+    return px[3] < 128; // opaque = body
   }
 
   show() {
-    fill(this.color);
+    fill(this.fillColor);
+    stroke(this.strokeColor);
     circle(this.x, this.y, this.r * 2);
   }
 }
 
-function createRandomBall() {
-  let ballX = random(0, width);
-  let ballY = random(0, height);
-  let ballC = color(20, 130, 140 + random(-100, 100), 100); // last digit is opacity
-  let ballR = 10;
-  let ball = new Ball(ballX, ballY, ballC, ballR);
-  return ball;
+// 2. Create a FlickerBall class
+class FlickerBall extends Ball {
+  respond(active) {
+    super.respond(active);
+    // this.fillColor = color(0, 0, 0, 100);
+    this.changeSize(3);
+  }
 }
