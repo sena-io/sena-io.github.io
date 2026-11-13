@@ -3,7 +3,7 @@
 // methods
 // this is a blueprint for creating stuff.
 // We can create new balls using this.
-class Ball {
+class Mosquito {
   // this function is called when an instance of Ball is created.
   // x ix x position
   // y is y position

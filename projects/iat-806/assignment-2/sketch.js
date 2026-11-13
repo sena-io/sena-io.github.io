@@ -1,11 +1,5 @@
-// an array to put all the balls in.
-let balls = [];
-// numBalls is written in camelCase.
-// you could also write in camel_case
-// this is the number of balls that you want to create.
-let numBalls = 3000;
-// no color variables, no position variables, they are all defined within the class.
-
+let mosquitos = [];
+let numMosquitos = 10;
 let bodySegmentation;
 let video;
 let segmentation;
@@ -16,8 +10,8 @@ let options = {
 
 async function setup() {
   createCanvas(800, 600);
-  for (let i = 0; i < numBalls; i++) {
-    balls.push(createRandomBall());
+  for (let i = 0; i < numMosquitos; i++) {
+    mosquitos.push(createRandomMosquito());
   }
 
   bodySegmentation = await ml5.bodySegmentation("SelfieSegmentation", options);
@@ -30,36 +24,29 @@ async function setup() {
   bodySegmentation.detectStart(video, gotResults);
 }
 
+function gotResults(result) {
+  segmentation = result;
+}
+
 function draw() {
   background(10);
   // image(video, 0, 0);
-  for (let ball of balls) {
-    let onBody = segmentation && ball.isOnBody(segmentation.mask);
+  for (let mosquito of mosquitos) {
+    let onBody = segmentation && mosquito.isOnBody(segmentation.mask);
 
-    let active = ball.contains(mouseX, mouseY) || onBody;
+    let active = mosquito.contains(mouseX, mouseY) || onBody;
 
-    ball.respond(active);
+    mosquito.respond(active);
 
-    ball.update(1);
+    mosquito.update(1);
   }
 }
 
-function createRandomBall() {
-  let ballX = random(0, width);
-  let ballY = random(0, height);
-  let ballC = color(140, 0, 140 + random(-100, 100), 150);
-  let ballR = 5;
-  let randomNumber = Math.random();
+function createRandomMosquito() {
+  let mosquitoX = random(0, width);
+  let mosquitoY = random(0, height);
+  let mosquitoC = color(140, 0, 140 + random(-100, 100), 150);
+  let mosquitoR = 5;
 
-  if (Math.random() < 0.2) {
-    return new BubblyBall(ballX, ballY, ballC, ballR);
-  } else if (randomNumber < 0.3) {
-    return new HappyBall(ballX, ballY, ballC, ballR);
-  } else {
-    return new Ball(ballX, ballY, ballC, ballR);
-  }
-}
-
-function gotResults(result) {
-  segmentation = result;
+  return new Mosquito(mosquitoX, mosquitoY, mosquitoC, mosquitoR);
 }
