@@ -11,12 +11,10 @@ let options = {
   maskType: "person",
 }
 
-function preload(){
-  startImg = loadImage("game/start.png");
-}
 
 async function setup() {
   createCanvas(800, 600);
+  startImg = await loadImage("game/start.png");
   for (let i = 0; i < numMosquitos; i++) {
     mosquitos.push(createRandomMosquito());
   }
@@ -43,7 +41,7 @@ function draw() {
   if (!started) {
     push();
     imageMode(CENTER);
-    image(startImg, width/2, height/2);
+    image(startImg, width/2, height/2, width, height);
     pop();
     // fill(255);
     // noStroke();
