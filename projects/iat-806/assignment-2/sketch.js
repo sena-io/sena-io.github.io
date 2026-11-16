@@ -6,6 +6,7 @@ let segmentation;
 let started = false;
 let ready = false;
 let startImg;
+let mosquitoImg;
 
 let options = {
   maskType: "person",
