@@ -68,37 +68,37 @@ class Mosquito {
   }
 }
 
-class BubblyBall extends Ball {
-  respond(active) {
-    // whoever called the respond method, it will pass the value of "active" to this method
-    // do the things that the parent class does
-    super.respond(active);
-    // Now we can do new things
-    this.changeSize(3);
-  }
-}
+// class BubblyBall extends Ball {
+//   respond(active) {
+//     // whoever called the respond method, it will pass the value of "active" to this method
+//     // do the things that the parent class does
+//     super.respond(active);
+//     // Now we can do new things
+//     this.changeSize(3);
+//   }
+// }
 
-class HappyBall extends Ball {
-  // why use constructor? because we're using new attribute that the ball didn't have
-  constructor(x, y, fillColor, r) {
-    super(x, y, fillColor, r);
-    this.emojiText = "❤️";
-    // this.sizeMultiplier = 5;
-  }
+// class HappyBall extends Ball {
+//   // why use constructor? because we're using new attribute that the ball didn't have
+//   constructor(x, y, fillColor, r) {
+//     super(x, y, fillColor, r);
+//     this.emojiText = "❤️";
+//     // this.sizeMultiplier = 5;
+//   }
 
-  respond(active) {
-    if (active) {
-      this.sizeMultiplier = 10;
-    } else {
-      this.sizeMultiplier = 1;
-    }
-  }
+//   respond(active) {
+//     if (active) {
+//       this.sizeMultiplier = 10;
+//     } else {
+//       this.sizeMultiplier = 1;
+//     }
+//   }
 
-  show() {
-    textSize(this.r * this.sizeMultiplier);
-    noStroke();
-    text(this.emojiText, this.x, this.y);
-  }
-}
+//   show() {
+//     textSize(this.r * this.sizeMultiplier);
+//     noStroke();
+//     text(this.emojiText, this.x, this.y);
+//   }
+// }
 
 // Use a game state class. Update the score
