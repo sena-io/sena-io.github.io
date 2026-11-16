@@ -3,10 +3,17 @@ let numMosquitos = 10;
 let bodySegmentation;
 let video;
 let segmentation;
+let started = false;
+let ready = false;
+let startImg;
 
 let options = {
   maskType: "person",
-};
+}
+
+function preload(){
+  startImg = loadImage("game/start.png");
+}
 
 async function setup() {
   createCanvas(800, 600);
@@ -22,6 +29,7 @@ async function setup() {
   video.hide();
 
   bodySegmentation.detectStart(video, gotResults);
+  ready = true;
 }
 
 function gotResults(result) {
@@ -31,6 +39,20 @@ function gotResults(result) {
 function draw() {
   background(10);
   // image(video, 0, 0);
+
+  if (!started) {
+    push();
+    imageMode(CENTER);
+    image(startImg, width/2, height/2);
+    pop();
+    // fill(255);
+    // noStroke();
+    // textSize(40);
+    // textAlign(CENTER, CENTER);
+    // text(ready ? "Click to start" : "Loading...", width / 2, height / 2);
+    return; // skip the mosquito logic until the user clicks
+  }
+
   for (let mosquito of mosquitos) {
     let onBody = segmentation && mosquito.isOnBody(segmentation.mask);
 
@@ -49,4 +71,11 @@ function createRandomMosquito() {
   let mosquitoR = 5;
 
   return new Mosquito(mosquitoX, mosquitoY, mosquitoC, mosquitoR);
+}
+
+
+function mousePressed() {
+  if (ready && !started) {
+    started = true;
+  }
 }
