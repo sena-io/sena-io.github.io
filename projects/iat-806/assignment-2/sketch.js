@@ -7,15 +7,18 @@ let started = false;
 let ready = false;
 let startImg;
 let mosquitoImg;
+let mosquitoLiveImg;
+let mosqquitoDeadImg;
 
 let options = {
   maskType: "person",
-}
-
+};
 
 async function setup() {
   createCanvas(800, 600);
   startImg = await loadImage("game/start.png");
+  mosquitoLiveImg = await loadImage("game/mosquito_live.png");
+  mosqquitoDeadImg = await loadImage("game/mosquito_dead.png");
   for (let i = 0; i < numMosquitos; i++) {
     mosquitos.push(createRandomMosquito());
   }
@@ -42,7 +45,7 @@ function draw() {
   if (!started) {
     push();
     imageMode(CENTER);
-    image(startImg, width/2, height/2, width, height);
+    image(startImg, width / 2, height / 2, width, height);
     pop();
     // fill(255);
     // noStroke();
@@ -66,12 +69,10 @@ function draw() {
 function createRandomMosquito() {
   let mosquitoX = random(0, width);
   let mosquitoY = random(0, height);
-  let mosquitoC = color(140, 0, 140 + random(-100, 100), 150);
-  let mosquitoR = 5;
+  let mosquitoR = 20;
 
-  return new Mosquito(mosquitoX, mosquitoY, mosquitoC, mosquitoR);
+  return new Mosquito(mosquitoX, mosquitoY, mosquitoLiveImg, mosquitoR);
 }
-
 
 function mousePressed() {
   if (ready && !started) {

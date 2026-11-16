@@ -10,15 +10,12 @@ class Mosquito {
   // c is color
   // r is radius
   // this is the function that is called when you create a new ball or a new instance of this Class.
-  constructor(x, y, fillColor, r) {
+  constructor(x, y, img, r) {
     this.x = x;
     this.y = y;
-
+    this.img = img;
     this.baseR = r;
     this.r = r;
-    this.origColor = fillColor;
-    this.fillColor = fillColor;
-    this.highlightColor = color(100, 100, 100, 50);
   }
 
   update(byHowMuch) {
@@ -62,43 +59,9 @@ class Mosquito {
   }
 
   show() {
-    fill(this.fillColor);
-    noStroke();
-    circle(this.x, this.y, this.r * 2);
+    imageMode(CENTER);
+    //image((what to drwa, x position, y posotion, width, height)
+    //things in the braket are called "arguments"
+    image(this.img, this.x, this.y, this.r * 2, this.r * 2);
   }
 }
-
-// class BubblyBall extends Ball {
-//   respond(active) {
-//     // whoever called the respond method, it will pass the value of "active" to this method
-//     // do the things that the parent class does
-//     super.respond(active);
-//     // Now we can do new things
-//     this.changeSize(3);
-//   }
-// }
-
-// class HappyBall extends Ball {
-//   // why use constructor? because we're using new attribute that the ball didn't have
-//   constructor(x, y, fillColor, r) {
-//     super(x, y, fillColor, r);
-//     this.emojiText = "❤️";
-//     // this.sizeMultiplier = 5;
-//   }
-
-//   respond(active) {
-//     if (active) {
-//       this.sizeMultiplier = 10;
-//     } else {
-//       this.sizeMultiplier = 1;
-//     }
-//   }
-
-//   show() {
-//     textSize(this.r * this.sizeMultiplier);
-//     noStroke();
-//     text(this.emojiText, this.x, this.y);
-//   }
-// }
-
-// Use a game state class. Update the score
