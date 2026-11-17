@@ -192,28 +192,28 @@ function draw() {
 
       bloodTimer--; // Decrease the timer by 1 each frame
     }
-  }
 
-  if (isCaught) {
-    score++;
-    mosquitos.splice(i, 1);
+    if (isCaught) {
+      score++;
+      mosquitos.splice(i, 1);
 
-    // Set the timer and location instead of drawing immediately
-    bloodTimer = 30;
-    bloodX = clapX;
-    bloodY = clapY;
-  } else {
-    mosquito.update(1);
-  }
+      // Set the timer and location instead of drawing immediately
+      bloodTimer = 30;
+      bloodX = clapX;
+      bloodY = clapY;
+    } else {
+      mosquito.update(1);
+    }
 
-  // Show the score
-  fill(255);
-  textSize(32);
-  textAlign(LEFT, TOP);
-  text("Score: " + score, 10, 10);
+    // Show the score
+    fill(255);
+    textSize(32);
+    textAlign(LEFT, TOP);
+    text("Score: " + score, 10, 10);
 
-  if (score == numMosquitos) {
-    success = true;
+    if (score == numMosquitos) {
+      success = true;
+    }
   }
 
   // Show the time left
