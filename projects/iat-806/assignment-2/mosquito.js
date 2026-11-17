@@ -4,12 +4,6 @@
 // this is a blueprint for creating stuff.
 // We can create new balls using this.
 class Mosquito {
-  // this function is called when an instance of Ball is created.
-  // x ix x position
-  // y is y position
-  // c is color
-  // r is radius
-  // this is the function that is called when you create a new ball or a new instance of this Class.
   constructor(x, y, img, r) {
     this.x = x;
     this.y = y;

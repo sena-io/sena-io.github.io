@@ -1,5 +1,5 @@
 let mosquitos = [];
-let numMosquitos = 1;
+let numMosquitos = 10;
 let video;
 let started = false;
 let ready = false;
@@ -14,6 +14,11 @@ let mosquitoLiveImg;
 let mosqquitoDeadImg;
 let winImg;
 let gameOverImg;
+let bloodImg;
+
+let bloodTimer = 0;
+let bloodX = 0;
+let bloodY = 0;
 
 let score = 0;
 let timeLeft;
@@ -46,6 +51,8 @@ async function setup() {
   mosqquitoDeadImg = await loadImage("game/mosquito_dead.png");
   winImg = await loadImage("game/win.png");
   gameOverImg = await loadImage("game/gameover.png");
+  bloodImg = await loadImage("game/blood.png");
+
   // mosquitoSound = await loadSoundAsync("sounds/mosquito.wav");
   // clapSound = await loadSoundAsync("sounds/clap.wav");
 
@@ -125,7 +132,7 @@ function draw() {
     mosquitoSound.stop();
     imageMode(CENTER);
     image(winImg, width / 2, height / 2, 400, 200);
-    text("You killed: " + score, 300, 400);
+    text("You killed: " + score, 300, 400 + " mosquitoes", 270, 400);
     pop();
     return;
   }
@@ -135,7 +142,7 @@ function draw() {
     push();
     imageMode(CENTER);
     image(gameOverImg, width / 2, height / 2, 400, 200);
-    text("You save: " + (numMosquitos - score), 325, 400);
+    text("You saved: " + (numMosquitos - score) + " mosquitoes", 270, 400);
     pop();
     return;
   }
@@ -177,12 +184,26 @@ function draw() {
       }
     }
 
-    if (isCaught) {
-      score++;
-      mosquitos.splice(i, 1);
-    } else {
-      mosquito.update(1);
+    if (bloodTimer > 0) {
+      push();
+      imageMode(CENTER);
+      image(bloodImg, bloodX, bloodY, 150, 150);
+      pop();
+
+      bloodTimer--; // Decrease the timer by 1 each frame
     }
+  }
+
+  if (isCaught) {
+    score++;
+    mosquitos.splice(i, 1);
+
+    // Set the timer and location instead of drawing immediately
+    bloodTimer = 30;
+    bloodX = clapX;
+    bloodY = clapY;
+  } else {
+    mosquito.update(1);
   }
 
   // Show the score
@@ -231,7 +252,7 @@ function mousePressed() {
     bgmStarted = false; // 다음 게임에서 다시 재생될 수 있도록 리셋!
 
     score = 0;
-    timeLeft = 60;
+    timeLeft = 30;
     timer = millis();
     gameOver = false;
     success = false;
