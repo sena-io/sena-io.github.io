@@ -1,8 +1,8 @@
 let mosquitos = [];
 let numMosquitos = 10;
-let bodySegmentation;
+// let bodySegmentation;
 let video;
-let segmentation;
+// let segmentation;
 let started = false;
 let ready = false;
 let success = false;
@@ -16,12 +16,28 @@ let winImg;
 let gameOverImg;
 
 let score = 0;
-let timeLeft = 10;
+let timeLeft;
 let timer = 0;
 
+let mosquitoSound;
+let clapSound;
+let isClapping = false;
+
 let options = {
-  maskType: "person",
+  flipped: true,
 };
+// let options = {
+//   maskType: "person",
+// };
+
+let handPose;
+let hands = [];
+
+function loadSoundAsync(path) {
+  return new Promise((resolve, reject) => {
+    loadSound(path, resolve, reject);
+  });
+}
 
 async function setup() {
   createCanvas(800, 600);
@@ -30,6 +46,16 @@ async function setup() {
   mosqquitoDeadImg = await loadImage("game/mosquito_dead.png");
   winImg = await loadImage("game/win.png");
   gameOverImg = await loadImage("game/gameover.png");
+  // mosquitoSound = await loadSoundAsync("sounds/mosquito.wav");
+  // clapSound = await loadSoundAsync("sounds/clap.wav");
+
+  try {
+    mosquitoSound = await loadSound("sounds/mosquito.wav");
+    clapSound = await loadSound("sounds/clap.wav");
+    console.log("sounds loaded", mosquitoSound, clapSound);
+  } catch (err) {
+    console.error("Sound failed to load:", err);
+  }
 
   // mosquitoSounds = sounds.push(await loadSound("sounds/sound" + i + ".wav"));
 
@@ -37,24 +63,48 @@ async function setup() {
     mosquitos.push(createRandomMosquito());
   }
 
-  bodySegmentation = await ml5.bodySegmentation("SelfieSegmentation", options);
+  //previous code
+  // bodySegmentation = await ml5.bodySegmentation("SelfieSegmentation", options);
 
   // Create the video
   video = createCapture(VIDEO);
   video.size(width, height);
   video.hide();
 
-  bodySegmentation.detectStart(video, gotResults);
+  //previous code
+  // bodySegmentation.detectStart(video, gotResults);
+
+  // Load the handpose model
+  handPose = await ml5.handPose(options);
+
+  // Start detecting hands
+  handPose.detectStart(video, gotResults);
+
   ready = true;
 }
 
 function gotResults(result) {
-  segmentation = result;
+  hands = result;
 }
 
 function draw() {
   background(10);
-  // image(video, width / 2, height / 2, 800, 600);
+
+  push();
+  translate(width, 0); // Move origin to the right edge
+  scale(-1, 1); // Flip the X axis backwards
+
+  imageMode(CORNER);
+  image(video, 0, 0, width, height);
+  pop();
+
+  //visual debug
+  for (let i = 0; i < hands.length; i++) {
+    let indexFinger = hands[i].index_finger_tip;
+    fill(0, 255, 0); // Bright green
+    noStroke();
+    circle(indexFinger.x, indexFinger.y, 20);
+  }
 
   if (!started) {
     push();
@@ -82,23 +132,47 @@ function draw() {
     return;
   }
 
-  //Playing
-  // checking if it's on the body(or hand) and if it is, remove it from the array and icrease the score
+  // --- 1. DETECT THE CLAP ONCE PER FRAME ---
+  let clapX = null;
+  let clapY = null;
+
+  if (hands.length === 2) {
+    let hand1 = hands[0].index_finger_tip;
+    let hand2 = hands[1].index_finger_tip;
+    let clapDistance = dist(hand1.x, hand1.y, hand2.x, hand2.y);
+
+    if (clapDistance < 150) {
+      // Calculate the center point of the clap
+      clapX = (hand1.x + hand2.x) / 2;
+      clapY = (hand1.y + hand2.y) / 2;
+
+      // Only play the sound if we weren't ALREADY clapping
+      if (!isClapping) {
+        clapSound.play();
+        isClapping = true;
+      }
+    } else {
+      // Hands moved apart, reset so the player can clap again
+      isClapping = false;
+    }
+  }
+
+  // --- 2. UPDATE MOSQUITOS ---
   for (let i = mosquitos.length - 1; i >= 0; i--) {
-    //definding mosquito's number in the array
     let mosquito = mosquitos[i];
-    // checking it the mosquito is on the body using the segmentation mask
-    // checking if the segmentation is ready so that it doesn't crash
-    // ** I've tried to use "catch" as a variable name but it didn't work because "catch" is a reserved word in JavaScript
-    let isCaught = segmentation && mosquito.isOnBody(segmentation.mask);
+    let isCaught = false;
+
+    // If a clap happened this frame, check if it hit this specific mosquito
+    if (clapX !== null && clapY !== null) {
+      if (mosquito.contains(clapX, clapY)) {
+        isCaught = true;
+      }
+    }
 
     if (isCaught) {
-      // increase the score
       score++;
-      // remove the mosquito from the array
-      mosquitos.splice(i, 1); // Remove the mosquito from the array
+      mosquitos.splice(i, 1);
     } else {
-      // update and show the mosquito
       mosquito.update(1);
     }
   }
@@ -115,7 +189,7 @@ function draw() {
 
   // Show the time left
 
-  let timeLeft = 10 - Math.floor((millis() - timer) / 1000);
+  let timeLeft = 30 - Math.floor((millis() - timer) / 1000);
 
   if (timeLeft > 0) {
     text(
@@ -139,19 +213,27 @@ function createRandomMosquito() {
 }
 
 function mousePressed() {
+  userStartAudio();
+  console.log("audio context:", getAudioContext().state);
+
   if (ready && !started) {
     started = true;
-    timer = millis(); // Start the timer
+    timer = millis();
+
+    mosquitoSound.setLoop(true);
+    mosquitoSound.play();
+
+    setTimeout(() => {
+      console.log("after 500ms:", mosquitoSound.playing, mosquitoSound.started);
+    }, 500);
   } else if (gameOver || success) {
-    // Reset the game
+    mosquitoSound.stop();
     score = 0;
-    timeLeft = 60;
     timer = millis();
     gameOver = false;
     success = false;
     started = false;
 
-    // Reset the mosquitos array
     mosquitos = [];
     for (let i = 0; i < numMosquitos; i++) {
       mosquitos.push(createRandomMosquito());

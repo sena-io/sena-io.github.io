@@ -46,9 +46,9 @@ class Mosquito {
   }
 
   show() {
+    push(); // Save the default settings
     imageMode(CENTER);
-    //image((what to drwa, x position, y posotion, width, height)
-    //things in the braket are called "arguments"
     image(this.img, this.x, this.y, this.r * 2, this.r * 2);
+    pop(); // Restore the default settings so it doesn't leak
   }
 }
