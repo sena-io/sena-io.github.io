@@ -1,12 +1,12 @@
 let mosquitos = [];
-let numMosquitos = 10;
-// let bodySegmentation;
+let numMosquitos = 1;
 let video;
-// let segmentation;
 let started = false;
 let ready = false;
 let success = false;
 let gameOver = false;
+
+let bgmStarted = false;
 
 let startImg;
 let mosquitoImg;
@@ -114,11 +114,18 @@ function draw() {
     return; // skip the mosquito logic until the user clicks
   }
 
+  if (bgmStarted === false) {
+    mosquitoSound.loop();
+    bgmStarted = true; // 다시 실행되지 않도록 잠금
+  }
+
   // Success
   if (success == true) {
     push();
+    mosquitoSound.stop();
     imageMode(CENTER);
     image(winImg, width / 2, height / 2, 400, 200);
+    text("You killed: " + score, 300, 400);
     pop();
     return;
   }
@@ -128,6 +135,7 @@ function draw() {
     push();
     imageMode(CENTER);
     image(gameOverImg, width / 2, height / 2, 400, 200);
+    text("You save: " + (numMosquitos - score), 325, 400);
     pop();
     return;
   }
@@ -213,27 +221,23 @@ function createRandomMosquito() {
 }
 
 function mousePressed() {
-  userStartAudio();
-  console.log("audio context:", getAudioContext().state);
-
   if (ready && !started) {
     started = true;
-    timer = millis();
-
-    mosquitoSound.setLoop(true);
+    timer = millis(); // Start the timer
     mosquitoSound.play();
-
-    setTimeout(() => {
-      console.log("after 500ms:", mosquitoSound.playing, mosquitoSound.started);
-    }, 500);
   } else if (gameOver || success) {
+    // Reset the game
     mosquitoSound.stop();
+    bgmStarted = false; // 다음 게임에서 다시 재생될 수 있도록 리셋!
+
     score = 0;
+    timeLeft = 60;
     timer = millis();
     gameOver = false;
     success = false;
     started = false;
 
+    // Reset the mosquitos array
     mosquitos = [];
     for (let i = 0; i < numMosquitos; i++) {
       mosquitos.push(createRandomMosquito());
