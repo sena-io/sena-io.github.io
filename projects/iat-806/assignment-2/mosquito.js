@@ -22,9 +22,6 @@ class Mosquito {
     this.y += random(-byHowMuch, byHowMuch);
   }
 
-  changeSize(byHowMuch) {
-    this.r = constrain(this.r + random(-byHowMuch, byHowMuch), 2, 30);
-  }
 
   contains(px, py) {
     if (dist(this.x, this.y, px, py) < this.r) {
@@ -34,10 +31,6 @@ class Mosquito {
     }
   }
 
-  isOnBody(mask) {
-    let px = mask.get(floor(this.x), floor(this.y)); // [r, g, b, a]
-    return px[3] < 128; // opaque = body
-  }
 
   show() {
     push(); // Save the default settings
