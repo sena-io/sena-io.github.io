@@ -40,19 +40,6 @@ class Mosquito {
     }
   }
 
-  respond(active) {
-    if (active) this.highlight();
-    else this.deHighlight();
-  }
-
-  highlight() {
-    this.fillColor = this.highlightColor;
-  }
-
-  deHighlight() {
-    this.fillColor = this.origColor;
-  }
-
   isOnBody(mask) {
     let px = mask.get(floor(this.x), floor(this.y)); // [r, g, b, a]
     return px[3] < 128; // opaque = body

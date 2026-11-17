@@ -6,6 +6,7 @@ let segmentation;
 let started = false;
 let ready = false;
 let success = false;
+let gameOver = false;
 
 let startImg;
 let mosquitoImg;
@@ -15,7 +16,7 @@ let winImg;
 let gameOverImg;
 
 let score = 0;
-let timeLeft = 60;
+let timeLeft = 10;
 let timer = 0;
 
 let options = {
@@ -63,60 +64,69 @@ function draw() {
     return; // skip the mosquito logic until the user clicks
   }
 
-  if (success == false) {
-    // checking if it's on the body(or hand) and if it is, remove it from the array and icrease the score
-    for (let i = mosquitos.length - 1; i >= 0; i--) {
-      //definding mosquito's number in the array
-      let mosquito = mosquitos[i];
-      // checking it the mosquito is on the body using the segmentation mask
-      // checking if the segmentation is ready so that it doesn't crash
-      // ** I've tried to use "catch" as a variable name but it didn't work because "catch" is a reserved word in JavaScript
-      let isCaught = segmentation && mosquito.isOnBody(segmentation.mask);
-
-      if (isCaught) {
-        // increase the score
-        score++;
-        // remove the mosquito from the array
-        mosquitos.splice(i, 1); // Remove the mosquito from the array
-      } else {
-        // update and show the mosquito
-        mosquito.update(1);
-      }
-    }
-
-    // Show the score
-    fill(255);
-    textSize(32);
-    textAlign(LEFT, TOP);
-    text("Score: " + score, 10, 10);
-
-    if (score == numMosquitos) {
-      success = true;
-    }
-
-    // Show the time left
-    let timeLeft = 60 - Math.floor((millis() - timer) / 1000);
-
-    if (timeLeft > 0) {
-      text(
-        // rounding up the time left to the nearest second and subtracting it from the total time
-        "Time Left: " + timeLeft,
-        10,
-        50,
-      );
-    } else if (timeLeft === 0) {
-      text("Time Left: 0", 10, 50);
-      push();
-      imageMode(CENTER);
-      image(gameOverImg, width / 2, height / 2, 400, 200);
-      pop();
-    }
-  } else if (success == true) {
+  // Success
+  if (success == true) {
     push();
     imageMode(CENTER);
     image(winImg, width / 2, height / 2, 400, 200);
     pop();
-    noLoop(); // Stop the draw loop when the game is won
+    return;
+  }
+
+  // Game Over
+  if (gameOver == true) {
+    push();
+    imageMode(CENTER);
+    image(gameOverImg, width / 2, height / 2, 400, 200);
+    pop();
+    return;
+  }
+
+  //Playing
+  // checking if it's on the body(or hand) and if it is, remove it from the array and icrease the score
+  for (let i = mosquitos.length - 1; i >= 0; i--) {
+    //definding mosquito's number in the array
+    let mosquito = mosquitos[i];
+    // checking it the mosquito is on the body using the segmentation mask
+    // checking if the segmentation is ready so that it doesn't crash
+    // ** I've tried to use "catch" as a variable name but it didn't work because "catch" is a reserved word in JavaScript
+    let isCaught = segmentation && mosquito.isOnBody(segmentation.mask);
+
+    if (isCaught) {
+      // increase the score
+      score++;
+      // remove the mosquito from the array
+      mosquitos.splice(i, 1); // Remove the mosquito from the array
+    } else {
+      // update and show the mosquito
+      mosquito.update(1);
+    }
+  }
+
+  // Show the score
+  fill(255);
+  textSize(32);
+  textAlign(LEFT, TOP);
+  text("Score: " + score, 10, 10);
+
+  if (score == numMosquitos) {
+    success = true;
+  }
+
+  // Show the time left
+
+  let timeLeft = 10 - Math.floor((millis() - timer) / 1000);
+
+  if (timeLeft > 0) {
+    text(
+      // rounding up the time left to the nearest second and subtracting it from the total time
+      "Time Left: " + timeLeft,
+      10,
+      50,
+    );
+  } else if (timeLeft === 0) {
+    text("Time Left: 0", 10, 50);
+    gameOver = true;
   }
 }
 
@@ -132,11 +142,19 @@ function mousePressed() {
   if (ready && !started) {
     started = true;
     timer = millis(); // Start the timer
-  } else if (success) {
+  } else if (gameOver || success) {
     // Reset the game
     score = 0;
     timeLeft = 60;
     timer = millis();
+    gameOver = false;
+    success = false;
+    started = false;
+
+    // Reset the mosquitos array
     mosquitos = [];
+    for (let i = 0; i < numMosquitos; i++) {
+      mosquitos.push(createRandomMosquito());
+    }
   }
 }
