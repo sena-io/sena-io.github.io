@@ -5,10 +5,18 @@ let video;
 let segmentation;
 let started = false;
 let ready = false;
+let success = false;
+
 let startImg;
 let mosquitoImg;
 let mosquitoLiveImg;
 let mosqquitoDeadImg;
+let winImg;
+let gameOverImg;
+
+let score = 0;
+let timeLeft = 60;
+let timer = 0;
 
 let options = {
   maskType: "person",
@@ -19,6 +27,11 @@ async function setup() {
   startImg = await loadImage("game/start.png");
   mosquitoLiveImg = await loadImage("game/mosquito_live.png");
   mosqquitoDeadImg = await loadImage("game/mosquito_dead.png");
+  winImg = await loadImage("game/win.png");
+  gameOverImg = await loadImage("game/gameover.png");
+
+  // mosquitoSounds = sounds.push(await loadSound("sounds/sound" + i + ".wav"));
+
   for (let i = 0; i < numMosquitos; i++) {
     mosquitos.push(createRandomMosquito());
   }
@@ -40,29 +53,70 @@ function gotResults(result) {
 
 function draw() {
   background(10);
-  // image(video, 0, 0);
+  // image(video, width / 2, height / 2, 800, 600);
 
   if (!started) {
     push();
     imageMode(CENTER);
     image(startImg, width / 2, height / 2, width, height);
     pop();
-    // fill(255);
-    // noStroke();
-    // textSize(40);
-    // textAlign(CENTER, CENTER);
-    // text(ready ? "Click to start" : "Loading...", width / 2, height / 2);
     return; // skip the mosquito logic until the user clicks
   }
 
-  for (let mosquito of mosquitos) {
-    let onBody = segmentation && mosquito.isOnBody(segmentation.mask);
+  if (success == false) {
+    // checking if it's on the body(or hand) and if it is, remove it from the array and icrease the score
+    for (let i = mosquitos.length - 1; i >= 0; i--) {
+      //definding mosquito's number in the array
+      let mosquito = mosquitos[i];
+      // checking it the mosquito is on the body using the segmentation mask
+      // checking if the segmentation is ready so that it doesn't crash
+      // ** I've tried to use "catch" as a variable name but it didn't work because "catch" is a reserved word in JavaScript
+      let isCaught = segmentation && mosquito.isOnBody(segmentation.mask);
 
-    let active = mosquito.contains(mouseX, mouseY) || onBody;
+      if (isCaught) {
+        // increase the score
+        score++;
+        // remove the mosquito from the array
+        mosquitos.splice(i, 1); // Remove the mosquito from the array
+      } else {
+        // update and show the mosquito
+        mosquito.update(1);
+      }
+    }
 
-    mosquito.respond(active);
+    // Show the score
+    fill(255);
+    textSize(32);
+    textAlign(LEFT, TOP);
+    text("Score: " + score, 10, 10);
 
-    mosquito.update(1);
+    if (score == numMosquitos) {
+      success = true;
+    }
+
+    // Show the time left
+    let timeLeft = 60 - Math.floor((millis() - timer) / 1000);
+
+    if (timeLeft > 0) {
+      text(
+        // rounding up the time left to the nearest second and subtracting it from the total time
+        "Time Left: " + timeLeft,
+        10,
+        50,
+      );
+    } else if (timeLeft === 0) {
+      text("Time Left: 0", 10, 50);
+      push();
+      imageMode(CENTER);
+      image(gameOverImg, width / 2, height / 2, 400, 200);
+      pop();
+    }
+  } else if (success == true) {
+    push();
+    imageMode(CENTER);
+    image(winImg, width / 2, height / 2, 400, 200);
+    pop();
+    noLoop(); // Stop the draw loop when the game is won
   }
 }
 
@@ -77,5 +131,12 @@ function createRandomMosquito() {
 function mousePressed() {
   if (ready && !started) {
     started = true;
+    timer = millis(); // Start the timer
+  } else if (success) {
+    // Reset the game
+    score = 0;
+    timeLeft = 60;
+    timer = millis();
+    mosquitos = [];
   }
 }
