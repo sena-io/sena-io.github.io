@@ -10,6 +10,7 @@ let options = {
   flipped: true,
 };
 
+let wrist;
 let indexJoint;
 let indexTip;
 let fingers = [
